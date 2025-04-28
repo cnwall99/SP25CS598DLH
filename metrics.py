@@ -1,5 +1,5 @@
 import tensorflow as tf
-import tensorflow_addons as tfa
+
 import numpy as np
 from sklearn.metrics import confusion_matrix, f1_score, average_precision_score, roc_auc_score
 
@@ -47,7 +47,7 @@ class Recall(FromLogitsMixin, tf.metrics.Recall):
     ...
 
 
-class F1Score(FromLogitsMixin, tfa.metrics.F1Score):
+class F1Score(FromLogitsMixin, tf.keras.metrics.F1Score):
     ...
 
 
