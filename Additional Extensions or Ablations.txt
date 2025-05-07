@@ -1,0 +1,59 @@
+Additional Extensions or Ablations (5)
+Use LLMs to help brainstorm at least one new extension - new dataset, new loss function, removing a part of the model (ablation study), etc.
+What extensions did the LLM come up with? How valid are they?
+What were your insights and analysis on making prompts effective for brainstorming / implementation?
+Use LLMs to help implement your planned extension/ablation and validate them. Include results and a discussion of the extension/ablation.
+
+The LLM suggested 4 additional extensions or ablations: transfer learning, focal loss, ablation on transformer components, and temporal information enhancement. Transfer learning is valid since even though we are mainly focused on pediatric sleep apnea, there is limited samples of NCH and CHAT datasets compared to adult datasets like SHSS or MESA. Focal Loss is valid since sleep apnea events are less common and harder to classify than normal breathing which produces a class imbalance. Ablation on transformer components is valid because the researchers did not provide a reason why they chose these layers on this transformer architecture or which layers contributes to the performance more. It can help with optimization of the model size and which components are the most important for sleep apnea detection. Temporal information is valid because there are several sleep stages we encounter throughout the night and may lead to missing some relevant temporal dependencies. The only problem for this is there is already a limited data for pediatric sleep and the problems encountered with preprocessing will be further increased.
+
+It is very important to be specific about the number of results you want from the LLM. When we first asked for suggestions about additional extensions or ablations, the LLM gave us a list of more than 20. We had to add that we wanted the most relevant and feasible extension/ablation as well as give an explanation to some of their pros and cons. We went with Focal Loss as this looked to be a feasible extension to add as well as relevant to sleep apnea data.
+
+Below is our Focal Loss implementation with the help of LLM:
+class FocalLoss(tf.keras.losses.Loss):
+    def __init__(self, gamma=2.0, alpha=0.25, from_logits=False, **kwargs):
+        super().__init__(**kwargs)
+        self.gamma = gamma
+        self.alpha = alpha
+        self.from_logits = from_logits
+        
+    def call(self, y_true, y_pred):
+        if self.from_logits:
+            y_pred = tf.nn.sigmoid(y_pred)
+            
+        bce = K.binary_crossentropy(y_true, y_pred)
+        p_t = (y_true * y_pred) + ((1 - y_true) * (1 - y_pred))
+        alpha_t = y_true * self.alpha + (1 - y_true) * (1 - self.alpha)
+        focal_term = K.pow(1 - p_t, self.gamma)
+        loss = alpha_t * focal_term * bce
+        
+        return K.mean(loss)
+
+class CombinedBCEFocalLoss(tf.keras.losses.Loss):
+    def __init__(self, gamma=2.0, alpha=0.25, bce_weight=0.5, focal_weight=0.5, from_logits=False, **kwargs):
+        super().__init__(**kwargs)
+        self.gamma = gamma
+        self.alpha = alpha
+        self.bce_weight = bce_weight
+        self.focal_weight = focal_weight
+        self.from_logits = from_logits
+        
+    def call(self, y_true, y_pred):
+        if self.from_logits:
+            y_pred = tf.nn.sigmoid(y_pred)
+            
+        bce = K.binary_crossentropy(y_true, y_pred)
+        
+        p_t = (y_true * y_pred) + ((1 - y_true) * (1 - y_pred))
+        alpha_t = y_true * self.alpha + (1 - y_true) * (1 - self.alpha)
+        focal_term = K.pow(1 - p_t, self.gamma)
+        focal = alpha_t * focal_term * bce
+        
+        combined_loss = (self.bce_weight * bce) + (self.focal_weight * focal)
+        
+        return K.mean(combined_loss)
+
+We compared the results of Binary Cross-Entropy loss, Focal loss, and combined BCE and Focal loss in the SEM-MSCNN model:
+For BCE, F1 = 50.86, AUROC = 90.90, AUPRC = 89.22, Accuracy = 34.10, Precision = 34.10, Recall = 100.00, Specificity = 0.00
+For Focal Loss, F1 = 89.24, AUROC = 96.44, AUPRC = 96.17, Accuracy = 92.50, Precision = 87.36, Recall = 91.20, Specificity = 93.17
+For Combined, F1 = 82.27, AUROC = 92.66, AUPRC = 91.89, Accuracy = 89.70, Precision = 99.58, Recall = 70.09, Specificity = 99.85
+The results suggests that focal loss would be the best choice for pediatric sleep apnea studies because it gives a good balance between identifying true apnea events and avoiding false alarms. BCE appears to be limited especially the default implementation that we used which may be caused by the big class imbalance of our data. For clinical data which want to avoid false positives as much as possible, the combined BCE and Focal loss can be considered. The high AUROC values across all three losses might mean that we could increase the thresholds compared to what the researchers suggested of 0.5. 
