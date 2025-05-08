@@ -13,7 +13,7 @@ from train import train
 
 # 8- ECG3 - ECG1
 
-# 9- CANULAFLOW
+# 9- CANULAFLOW1
 # 10- AIRFLOW
 # 11- CHEST
 # 12- ABD
@@ -46,10 +46,17 @@ for ch in channel_list_chat:
         chs = chs + sig_dict_chat[name]
     print(chstr, chs)
     config = {
-        "data_path": "D:\\Data\\chat_3_64.npz",
-        "model_path": "./weights/hybrid_chat_all/f",
+        "data_path": "C:\\Users\\Francis\\Desktop\\Pediatric-Apnea-Detection-main\\data\\chat\\",
+        "model_path": "C:\\Users\\Francis\\Desktop\\Pediatric-Apnea-Detection-main\\weights\\hybrid_chat_all\\f",
         "model_name": "hybrid_"+ chstr,
         "regression": False,
+
+        # Add loss function parameters
+        "loss_type": "bce",  # Options: "bce", "focal", "combined"
+        "focal_gamma": 2.0,
+        "focal_alpha": 0.25,
+        "bce_weight": 0.5,
+        "focal_weight": 0.5,
 
         "transformer_layers": 5,  # best 5
         "drop_out_rate": 0.25,  # best 0.25
@@ -61,4 +68,4 @@ for ch in channel_list_chat:
         "channels": chs,
     }
     train(config, 0)
-    # test(config, 0)
+    test(config, 0)

@@ -2,6 +2,9 @@ import tensorflow as tf
 from keras.layers import Layer
 from keras import initializers, regularizers, constraints
 
+from keras.saving import register_keras_serializable
+
+@register_keras_serializable(package="Custom")
 class InstanceNormalization(Layer):
     def __init__(self,
                  axis=-1,

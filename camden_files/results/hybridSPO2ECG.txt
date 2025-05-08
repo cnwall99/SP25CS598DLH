@@ -1,0 +1,17 @@
+{'data_path': 'D:\\Code\\CS598\\Project\\compressed_data\\', 'model_name': 'hybridSPO2ECG', 'model_path': './weights/semscnn_ecgspo2/hybrid', 'regression': False, 'transformer_layers': 5, 'drop_out_rate': 0.25, 'num_patches': 30, 'transformer_units': 32, 'regularization_weight': 0.001, 'num_heads': 4, 'epochs': 100, 'channels': [9, 11, 12], 'input_length': 11}
+=========================================================================== 
+[np.float64(96.186117467582)] 
+[0.0] 
+[np.float64(0.0)] 
+[np.float64(100.0)] 
+[0.0] 
+[np.float64(65.9278350515464)] 
+[np.float64(5.8695033197998345)] 
+Accuracy: 96.19 -+ 0.000 
+Precision: 0.00 -+ 0.000 
+Recall: 0.00 -+ 0.000 
+Specifity: 100.00 -+ 0.000 
+F1: 0.00 -+ 0.000 
+AUROC: 65.93 -+ 0.000 
+AUPRC: 5.87 -+ 0.000 
+$ 96.2 \pm 0.0$& $0.0 \pm 0.0$& $0.0 \pm 0.0$& $0.0 \pm 0.0$& $65.9 \pm 0.0$& 

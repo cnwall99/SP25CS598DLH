@@ -44,10 +44,17 @@ for ch in channel_list:
         chstr += name
         chs = chs + sig_dict[name]
     config = {
-        "data_path": "D:\\Code\\CS598\\Project\\compressed_data\\",
-        "model_path": "./weights/semscnn_ecgspo2/f",
+        "data_path": "data\\nch\\",
+        "model_path": "weights\\semscnn_ecgspo2\\f",
         "model_name": "sem-mscnn_" + chstr,
         "regression": False,
+
+        # Add loss function parameters
+        "loss_type": "bce",  # Options: "bce", "focal", "combined"
+        "focal_gamma": 2.0,
+        "focal_alpha": 0.25,
+        "bce_weight": 0.5,
+        "focal_weight": 0.5,
 
         "transformer_layers": 5,  # best 5
         "drop_out_rate": 0.25,  # best 0.25

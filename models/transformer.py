@@ -13,6 +13,9 @@ from keras import layers
 import tensorflow as tf
 from keras import layers
 
+from keras.saving import register_keras_serializable
+
+@register_keras_serializable(package="Custom")
 class Patches(layers.Layer):
     def __init__(self, patch_size, **kwargs):
         super(Patches, self).__init__(**kwargs)
@@ -38,7 +41,7 @@ class Patches(layers.Layer):
         patch_dims = patches.shape[-1]
         return tf.reshape(patches, [batch_size, -1, patch_dims])
 
-
+@register_keras_serializable(package="Custom")
 class PatchEncoder(Layer):
     def __init__(self, num_patches, projection_dim, l2_weight, **kwargs):
         super(PatchEncoder, self).__init__(**kwargs)
@@ -84,7 +87,7 @@ def create_transformer_model(input_shape, num_patches,
                                                    beta_initializer="glorot_uniform",
                                                    gamma_initializer="glorot_uniform")(inputs)
 
-    patches = Patches(patch_size=patch_size)(normalized_inputs)
+    patches = Patches(patch_size=1)(normalized_inputs)
     encoded_patches = PatchEncoder(num_patches=num_patches, projection_dim=projection_dim, l2_weight=l2_weight)(patches)
 
     for _ in range(transformer_layers):
@@ -120,23 +123,24 @@ def create_hybrid_transformer_model(input_shape):
 
     # Calculate patch_size and ensure it's a valid size
     patch_size = input_shape[0] // num_patches
-    patch_size = max(patch_size, 1)  # Ensure patch_size is at least 1
+    patch_size = 1  # Ensure patch_size is at least 1
 
     if patch_size <= 0 or patch_size > input_shape[0]:
         raise ValueError(f"Invalid patch_size {patch_size} for input sequence length {input_shape[0]}.")
 
     input1 = Input(shape=input_shape)
 
-    conv11 = Conv1D(16, 256)(input1)
-    conv12 = Conv1D(16, 256)(input1)
-    conv13 = Conv1D(16, 256)(input1)
+    conv11 = Conv1D(16, 3, padding='same')(input1)
+    conv12 = Conv1D(16, 3, padding='same')(input1)
+    conv13 = Conv1D(16, 3, padding='same')(input1)
 
-    pwconv1 = SeparableConvolution1D(32, 1)(input1)
-    pwconv2 = SeparableConvolution1D(32, 1)(pwconv1)
+    pwconv1 = SeparableConvolution1D(32, 1, padding='same')(input1)
+    pwconv2 = SeparableConvolution1D(32, 1, padding='same')(pwconv1)
 
-    conv21 = Conv1D(16, 256)(conv11)
-    conv22 = Conv1D(16, 256)(conv12)
-    conv23 = Conv1D(16, 256)(conv13)
+    conv21 = Conv1D(16, 3, padding='same')(conv11)
+    conv22 = Conv1D(16, 3, padding='same')(conv12)
+    conv23 = Conv1D(16, 3, padding='same')(conv13)
+
 
     concat = keras.layers.concatenate([conv21, conv22, conv23], axis=-1)
     concat = Dense(64, activation=relu)(concat)
