@@ -4,8 +4,8 @@ import os
 import random
 
 # Paths
-OUTPUT_CHAT_PATH = "C:\\Users\\Francis\\Desktop\\Pediatric-Apnea-Detection-main\\data\\chat"
-OUTPUT_NCH_PATH = "C:\\Users\\Francis\\Desktop\\Pediatric-Apnea-Detection-main\\data\\nch"
+OUTPUT_CHAT_PATH = "Pediatric-Apnea-Detection-main\\data\\chat"
+OUTPUT_NCH_PATH = "Pediatric-Apnea-Detection-main\\data\\nch"
 
 # Constants
 CHAT_FREQ = 128
