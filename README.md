@@ -8,6 +8,8 @@ Project Video Link - https://mediaspace.illinois.edu/media/t/1_qp3mt4ck
 
 Steps to run the code:
 
+1. Request access to NCH and CHAT datasets - https://sleepdata.org
+2. Download datafiles for NCH and CHAT using the ruby gem supplied by NSRR
 1. Clone file directory - https://github.com/cnwall99/SP25CS598DLH
 2. Update data paths and model paths on the following files: preprocessing.py, dataloader.py, main.py, test.py, train.py
 3. Run preprocessing.py in data/nch and data/chat 
